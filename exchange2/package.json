@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/danmermel/cryptosaurus#readme",
   "dependencies": {
-    "mysql": "^2.13.0"
+    "aws-sdk": "^2.88.0"
   }
 }

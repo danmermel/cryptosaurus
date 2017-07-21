@@ -3,6 +3,20 @@ var AWS = require('aws-sdk');
 
 // Load credentials and set the region from the JSON file
 AWS.config.loadFromPath('./config.json');
+var dynamodb = new AWS.DynamoDB();
+
+var q = {
+  ExpressionAttributeValues: {
+    ":v1": {
+      S: "BTC"
+    }
+  },
+  ScanIndexForward: false, // descending order
+  Limit:2,
+  KeyConditionExpression: 'currency_name = :v1',
+  TableName: 'exchange'
+};
+
 
 var sendSMS = function(message, callback) {
   var sns = new AWS.SNS();
@@ -21,18 +35,7 @@ var sendSMS = function(message, callback) {
 };
 
 var readBTCPrice = function(callback) {
-  var mysql = require ('mysql');
-  var config = require('./mysql.json');
-  var connection = mysql.createConnection(config);
-  connection.connect();
-
-  var sql = "SELECT * FROM exchange WHERE currency_name='BTC' ORDER BY event_date DESC LIMIT 2";
-  
-  connection.query(sql, function (error, results, fields) {
-    console.log(error, results, fields);
-    connection.end();
-    callback(error, results);
-  });
+  dynamodb.query(q, callback);
 };
 
 
@@ -44,9 +47,12 @@ exports.handler = function (event, context, callback) {
     if (err) {
       throw(new Error("Could not read from database"));
     }
-    console.log(data[0].price_usd, data[1].price_usd);
-    if (data[0].price_usd >= 2385 && data[1].price_usd< 2385) {
-      sendSMS('maths says BTC > 2385', callback);
+    var new_price = parseFloat(data.Items[0].price_usd.N);
+    var old_price = parseFloat(data.Items[1].price_usd.N);
+
+    console.log(new_price, old_price);
+    if (new_price >= 2750 && old_price< 2750) {
+      sendSMS('maths says BTC > 2750', callback);
     } else {
       console.log('not triggered');
       callback(null, data);

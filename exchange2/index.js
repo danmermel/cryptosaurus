@@ -1,35 +1,34 @@
-var mysql = require ('mysql');
+var AWS = require ('aws-sdk');
+AWS.config.loadFromPath('./config.json');
+var dynamodb = new AWS.DynamoDB();
 
 var writeToDB = function (data,  callback) {
 
   console.log('Trying connection');
-  var config = require('./mysql.json');
-  var connection = mysql.createConnection(config);
-  connection.connect();
-  console.log('Connection complete');
 
   var event_date = new Date().toISOString();
   var event_source = "cryptocompare";
-  var sql ="";
-  for(var i in data) {
-    var currency_name = i;
-    var price_btc = data[i].BTC;
-    var price_usd = data[i].USD;
-    sql += "INSERT INTO exchange (event_date, event_source, currency_name, price_btc, price_usd) VALUES ('"+event_date+"','"+event_source+"', '"+currency_name+"',"+ price_btc+","+ price_usd+");";
-  }
-  console.log(sql);
-  connection.query(sql, function (error, results, fields) {
-    if (error) {
-      console.log('SQL ERROR', error);
-      throw error;
+  var params ={
+    RequestItems:{
+      "exchange":[]
     }
-    // `results` is an array with one element for every statement in the query: 
-    console.log(results);
-    connection.end();
-    callback(null, results);
-  });
-
-
+  };
+  var key = new Date().getTime();
+  for(var i in data) {
+    var obj = {
+      PutRequest:{
+        Item:{}
+      }
+    };
+    obj.PutRequest.Item.id ={S: (key++).toString()}; 
+    obj.PutRequest.Item.event_date ={S: event_date}; 
+    obj.PutRequest.Item.currency_name ={S: i}; 
+    obj.PutRequest.Item.price_btc ={N: data[i].BTC.toString()}; 
+    obj.PutRequest.Item.price_usd ={N: data[i].USD.toString()}; 
+    params.RequestItems.exchange.push(obj);
+  }
+  console.log(params);
+  dynamodb.batchWriteItem(params, callback) ; 
 }
 
 exports.handler = function (event, context, callback) {
@@ -38,6 +37,9 @@ exports.handler = function (event, context, callback) {
    var obj = JSON.parse(str);
    console.log('THE DATA', obj);
    writeToDB(obj, function(err,data) {
+     if (err) {
+       console.log("ERROR!", err);
+     } 
      console.log("done!");
      callback(null,"success!");
    });
