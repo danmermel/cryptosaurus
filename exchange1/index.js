@@ -5,7 +5,6 @@ var AWS = require('aws-sdk');
 // Load credentials and set the region from the JSON file
 AWS.config.loadFromPath('./config.json');
 
-//var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 var kinesis = new AWS.Kinesis({ endpoint: "https://kinesis.eu-west-1.amazonaws.com"});
 
 var reader = function (done) {
