@@ -94,7 +94,7 @@ exports.handler = function (event, context, callback) {
     return callback (null);
   }
 */
- // console.log("currency is" , currency);
+ console.log("currency is" , currency);
 
  readCurrencyPrice(currency, function(err, data) {
     if (err) {
