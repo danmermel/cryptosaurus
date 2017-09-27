@@ -104,7 +104,7 @@ exports.handler = function (event, context, callback) {
     var numbers =[];
     for (var i =0; i<data.Items.length; i++) {
       // console.log("an item is ", i, data.Items[i]);
-      numbers.push(parseFloat(data.Items[i].price_usd.N));
+      numbers.push(parseFloat(data.Items[i].price_btc.N));
     };
     numbers = numbers.reverse();
 
@@ -140,7 +140,7 @@ exports.handler = function (event, context, callback) {
         }
         if (data.Items.length == 0 || alert == true) {
           console.log("ALERT!");
-          sendSMS("MACD > 0.1 for " + currency + ". MACD=" + macd_signal+" price="+ numbers[numbers.length-1], function(err, data) {
+          sendSMS("MACD > 0.1 for " + currency + ". MACD=" + macd_signal+" price="+ numbers[numbers.length-1]+" BTC", function(err, data) {
             writeToDB(currency, callback); 
           });
         } else {
