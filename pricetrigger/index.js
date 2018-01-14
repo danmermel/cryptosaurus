@@ -99,14 +99,14 @@ exports.handler = function (event, context, callback) {
     var numbers =[];
     for (var i =0; i<data.Items.length; i++) {
       // console.log("an item is ", i, data.Items[i]);
-      numbers.push(parseFloat(data.Items[i].price_usd.N));
+      numbers.push(parseFloat(data.Items[i].price_btc.N));
     };
     numbers = numbers.reverse();
 
 
    // compare newest element of array with  oldest 
     console.log(numbers[59], numbers[0])
-    if (numbers[59] > numbers[0]*1.1) {
+    if (numbers[59] > numbers[0]*1.05) {
       readAlertsLog(currency, function (err,data) {
         if (err) {
           throw(new Error("Could not read from database"));
@@ -115,7 +115,7 @@ exports.handler = function (event, context, callback) {
         if (data.Items.length > 0) {
           var last_alert_date = new Date(data.Items[0].event_date.S).getTime();  //in miliseconds
           var current_date = new Date().getTime();  //in ms
-          if (current_date > last_alert_date+(1000*60*5)) {     //last alert sent more than 10 mins ago
+          if (current_date > last_alert_date+(1000*60*60)) {     //last alert sent more than 1 hr ago
             alert = true;
           }
         }

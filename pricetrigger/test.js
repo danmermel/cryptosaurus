@@ -7,7 +7,7 @@ var event = {
      dynamodb: {
        Keys: {
          currency_name: {
-           S: "BTC"
+           S: "ETH"
          }
        }
      }

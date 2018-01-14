@@ -10,7 +10,7 @@ var kinesis = new AWS.Kinesis({ endpoint: "https://kinesis.eu-west-1.amazonaws.c
 var reader = function (done) {
   console.log("Making http request");
   var req = {
-    url:"https://min-api.cryptocompare.com/data/pricemulti?fsyms=ETH,BTC,XMR,DASH,LTC,XRP,XLM,ETC,REP,ICN,MLN,ZEC,DOGE,USDT,GNO,EOS&tsyms=BTC,USD",
+    url:"https://min-api.cryptocompare.com/data/pricemulti?fsyms=ADA,BCH,BTG,DGB,ETH,NEO,QTUM,SC,RLC,SNT,SPHR,STRAT,XDN,XEM,XVG,ZCL,BTC,XMR,DASH,LTC,XRP,XLM,ETC,REP,ICN,MLN,ZEC,GNO,EOS&tsyms=BTC,USD",
     json: true 
   };
   request(req, function (err,r,data){

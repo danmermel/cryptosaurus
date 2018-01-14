@@ -107,13 +107,14 @@ exports.handler = function (event, context, callback) {
       numbers.push(parseFloat(data.Items[i].price_btc.N));
     };
     numbers = numbers.reverse();
+//console.log(numbers);
 
     // MACD
     var MACD = technicalindicators.MACD;
     var obj = {
       values: numbers,
-      fastPeriod: 12*5, 
-      slowPeriod: 26*5, 
+      fastPeriod: 12*2, 
+      slowPeriod: 26*2, 
       signalPeriod      : 3 ,
       SimpleMAOscillator: false,
       SimpleMASignal    : false
@@ -122,10 +123,15 @@ exports.handler = function (event, context, callback) {
     var macd = MACD.calculate(obj);
     console.log(JSON.stringify(macd));  
     var macd_signal = macd[macd.length -1].histogram;
-    console.log(macd_signal);
+    var asset_price = numbers[numbers.length-1];
+
+    var pc = 100*macd_signal/asset_price;
+    console.log('macd', macd_signal);
+    console.log('pc', pc);
+    var threshold = 0.025 ;
 
    // compare newest element of array with  oldest 
-    if (macd_signal > 0.1)  {
+    if (pc > threshold)  {
       readAlertsLog(currency, function (err,data) {
         if (err) {
           throw(new Error("Could not read from database"));
@@ -140,7 +146,7 @@ exports.handler = function (event, context, callback) {
         }
         if (data.Items.length == 0 || alert == true) {
           console.log("ALERT!");
-          sendSMS("MACD > 0.1 for " + currency + ". MACD=" + macd_signal+" price="+ numbers[numbers.length-1]+" BTC", function(err, data) {
+          sendSMS("MACD > "+threshold+"% (" + pc+"%) for " + currency + ". MACD=" + macd_signal+" price="+ numbers[numbers.length-1]+" BTC", function(err, data) {
             writeToDB(currency, callback); 
           });
         } else {

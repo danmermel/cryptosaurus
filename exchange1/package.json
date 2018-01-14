@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/danmermel/cryptosaurus#readme",
   "dependencies": {
-    "aws-sdk": "^2.83.0",
     "request": "^2.81.0"
   }
 }
